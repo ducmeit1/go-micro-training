@@ -1,0 +1,43 @@
+syntax = "proto3";
+package training;
+option go_package = "./;pb";
+
+import "empty.proto";
+
+service FPTPeople {
+    rpc CreatePeople(People) returns (People);
+    rpc UpdatePeople(People) returns (People);
+    rpc FindPeople(FindPeopleRequest) returns (People);
+    rpc ListPeoples(ListPeopleRequest) returns (ListPeopleResponse);
+    rpc DeletePeople(DeletePeopleRequest) returns (Empty);
+}
+
+message People {
+    int64 id = 1;
+    string name = 2;
+    int64 age = 3;
+    string address = 4;
+    repeated Contact contacts = 5;
+}
+
+message Contact {
+    string phone_number = 1;
+    string email = 2;
+    string fax = 3;
+}
+
+message FindPeopleRequest {
+    int64 id = 1;
+}
+
+message ListPeopleRequest {
+    int64 age = 1;
+}
+
+message ListPeopleResponse {
+    repeated People peoples = 1;
+}
+
+message DeletePeopleRequest {
+    int64 id = 1;
+}
