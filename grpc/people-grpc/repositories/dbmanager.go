@@ -24,13 +24,20 @@ func NewDBManager() (PeopleRepository, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&models.People{})
+	err = db.AutoMigrate(
+		&models.People{},
+		&models.Contact{},
+	)
 
-	return &dbmanager{db}, nil
+	if err != nil {
+		return nil, err
+	}
+
+	return &dbmanager{db.Debug()}, nil
 }
 
 func (m *dbmanager) CreatePeople(ctx context.Context, model *models.People) (*models.People, error) {
-	if err := m.Save(model).Error; err != nil {
+	if err := m.Create(model).Error; err != nil {
 		return nil, err
 	}
 

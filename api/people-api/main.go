@@ -1,35 +1,32 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
+	"gin-training/api/people-api/handlers"
 	"gin-training/pb"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	conn, err := grpc.Dial(":2222", grpc.WithInsecure())
+	//Create grpc client connect
+	peopleConn, err := grpc.Dial(":2222", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
 
-	client := pb.NewFPTPeopleClient(conn)
+	//Singleton
+	peopleClient := pb.NewFPTPeopleClient(peopleConn)
 
-	people, err := client.CreatePeople(context.Background(), &pb.People{
-		Name:    "Client Duc",
-		Address: "Client FPT Software",
-		Age:     25,
-	})
-	if err != nil {
-		panic(err)
-	}
+	//Handler for GIN Gonic
+	h := handlers.NewPeopleHandler(peopleClient)
 
-	b, err := json.Marshal(people)
-	if err != nil {
-		panic(err)
-	}
+	g := gin.Default()
+	//Create routes
+	gr := g.Group("/v1/api")
+	gr.POST("/create", h.CreatePeople)
 
-	fmt.Println(string(b))
+	//Listen and serve
+	http.ListenAndServe(":3333", g)
 }

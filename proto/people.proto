@@ -13,11 +13,12 @@ service FPTPeople {
 }
 
 message People {
-    int64 id = 1;
-    string name = 2;
-    int64 age = 3;
-    string address = 4;
-    repeated Contact contacts = 5;
+    string id = 1;
+    string slut = 2;
+    string name = 3;
+    int64 age = 4;
+    string address = 5;
+    repeated Contact contacts = 6;
 }
 
 message Contact {
@@ -27,7 +28,8 @@ message Contact {
 }
 
 message FindPeopleRequest {
-    int64 id = 1;
+    string id = 1;
+    string slut = 2;
 }
 
 message ListPeopleRequest {
@@ -39,5 +41,5 @@ message ListPeopleResponse {
 }
 
 message DeletePeopleRequest {
-    int64 id = 1;
+    string id = 1;
 }
