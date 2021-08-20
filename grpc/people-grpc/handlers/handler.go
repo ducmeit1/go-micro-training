@@ -71,3 +71,48 @@ func (h *PeopleHandler) CreatePeople(ctx context.Context, in *pb.People) (*pb.Pe
 
 	return pResponse, nil
 }
+
+func (h *PeopleHandler) UpdatePeople(ctx context.Context, in *pb.People) (*pb.People, error) {
+	people, err := h.peopleRepository.GetPeopleByID(ctx, uuid.MustParse(in.Id))
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, err
+	}
+
+	if in.Address != "" {
+		people.Address = sql.NullString{
+			Valid:  true,
+			String: in.Address,
+		}
+	}
+
+	if in.Age != 0 && in.Age > 18 {
+		people.Age = in.Age
+	}
+
+	if in.Name != "" {
+		people.Name = in.Name
+	}
+
+	if in.Slut != "" {
+		people.Slut = in.Slut
+	}
+
+	newPeople, err := h.peopleRepository.UpdatePeople(ctx, people)
+	if err != nil {
+		return nil, err
+	}
+
+	pResponse := &pb.People{
+		Id:       newPeople.ID.String(),
+		Slut:     newPeople.Slut,
+		Name:     newPeople.Name,
+		Age:      newPeople.Age,
+		Address:  newPeople.Address.String,
+		Contacts: make([]*pb.Contact, 0),
+	}
+
+	return pResponse, nil
+}
