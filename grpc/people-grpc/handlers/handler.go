@@ -159,12 +159,33 @@ func (h *PeopleHandler) UpdatePeople(ctx context.Context, in *pb.People) (*pb.Pe
 }
 
 func (h *PeopleHandler) FindPeople(ctx context.Context, in *pb.FindPeopleRequest) (*pb.People, error) {
-	people, err := h.peopleRepository.GetPeopleByID(ctx, uuid.MustParse(in.Id))
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, status.Error(codes.NotFound, err.Error())
+	var (
+		people = &models.People{}
+		err    error
+	)
+
+	if in.Id == "" && in.Slut == "" {
+		return nil, status.Error(codes.InvalidArgument, "id or slut is required")
+	}
+
+	if in.Id != "" {
+		people, err = h.peopleRepository.GetPeopleByID(ctx, uuid.MustParse(in.Id))
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, status.Error(codes.NotFound, err.Error())
+			}
+			return nil, err
 		}
-		return nil, err
+	}
+
+	if in.Slut != "" {
+		people, err = h.peopleRepository.GetPeopleBySlut(ctx, in.Slut)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, status.Error(codes.NotFound, err.Error())
+			}
+			return nil, err
+		}
 	}
 
 	pRes := &pb.People{
