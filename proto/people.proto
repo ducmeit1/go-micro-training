@@ -22,9 +22,10 @@ message People {
 }
 
 message Contact {
-    string phone_number = 1;
-    string email = 2;
-    string fax = 3;
+    string id = 1;
+    string phone_number =2;
+    string email = 3;
+    string fax = 4;
 }
 
 message FindPeopleRequest {
