@@ -25,7 +25,7 @@ type People struct {
 	Slut      string         `gorm:"type:varchar(256);not null;unquie"`
 	Age       int64          `gorm:"type:integer"`
 	Address   sql.NullString `gorm:"type:varchar(256)"`
-	Contacts  []*Contact     `gorm:"foreignKey:PeopleID;references:Id;constraint:OnUpdate:CASCADE:OnDelete:CASCADE"` //Delete luôn Contacts nếu People bị Delete
+	Contacts  []*Contact     `gorm:"foreignKey:PeopleID;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"` //Delete luôn Contacts nếu People bị Delete
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
