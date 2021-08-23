@@ -93,15 +93,6 @@ func (m *dbmanager) UpdatePeople(ctx context.Context, model *models.People) (*mo
 }
 
 func (m *dbmanager) DeletePeople(ctx context.Context, id uuid.UUID) error {
-	contacts, err := m.GetContactsByPeopleID(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	if err := m.Unscoped().Delete(&contacts).Error; err != nil {
-		return err
-	}
-
 	people, err := m.GetPeopleByID(ctx, id)
 	if err != nil {
 		return err
