@@ -4,6 +4,7 @@ import (
 	"gin-training/api/people-api/handlers"
 	"gin-training/pb"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -21,8 +22,9 @@ func main() {
 
 	//Handler for GIN Gonic
 	h := handlers.NewPeopleHandler(peopleClient)
-
+	os.Setenv("GIN_MODE", "debug")
 	g := gin.Default()
+
 	//Create routes
 	gr := g.Group("/v1/api")
 	gr.POST("/create", h.CreatePeople)
