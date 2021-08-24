@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FPTPeopleJobClient interface {
-	AssignPeopleJob(ctx context.Context, in *PeopleJob, opts ...grpc.CallOption) (*PeopleJob, error)
+	AssignPeopleJob(ctx context.Context, in *AssignPeopleJobRequest, opts ...grpc.CallOption) (*PeopleJob, error)
 	ListPeopleJob(ctx context.Context, in *ListPeopleJobRequest, opts ...grpc.CallOption) (*ListPeopleJobResponse, error)
 }
 
@@ -30,7 +30,7 @@ func NewFPTPeopleJobClient(cc grpc.ClientConnInterface) FPTPeopleJobClient {
 	return &fPTPeopleJobClient{cc}
 }
 
-func (c *fPTPeopleJobClient) AssignPeopleJob(ctx context.Context, in *PeopleJob, opts ...grpc.CallOption) (*PeopleJob, error) {
+func (c *fPTPeopleJobClient) AssignPeopleJob(ctx context.Context, in *AssignPeopleJobRequest, opts ...grpc.CallOption) (*PeopleJob, error) {
 	out := new(PeopleJob)
 	err := c.cc.Invoke(ctx, "/training.FPTPeopleJob/AssignPeopleJob", in, out, opts...)
 	if err != nil {
@@ -52,7 +52,7 @@ func (c *fPTPeopleJobClient) ListPeopleJob(ctx context.Context, in *ListPeopleJo
 // All implementations must embed UnimplementedFPTPeopleJobServer
 // for forward compatibility
 type FPTPeopleJobServer interface {
-	AssignPeopleJob(context.Context, *PeopleJob) (*PeopleJob, error)
+	AssignPeopleJob(context.Context, *AssignPeopleJobRequest) (*PeopleJob, error)
 	ListPeopleJob(context.Context, *ListPeopleJobRequest) (*ListPeopleJobResponse, error)
 	mustEmbedUnimplementedFPTPeopleJobServer()
 }
@@ -61,7 +61,7 @@ type FPTPeopleJobServer interface {
 type UnimplementedFPTPeopleJobServer struct {
 }
 
-func (UnimplementedFPTPeopleJobServer) AssignPeopleJob(context.Context, *PeopleJob) (*PeopleJob, error) {
+func (UnimplementedFPTPeopleJobServer) AssignPeopleJob(context.Context, *AssignPeopleJobRequest) (*PeopleJob, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignPeopleJob not implemented")
 }
 func (UnimplementedFPTPeopleJobServer) ListPeopleJob(context.Context, *ListPeopleJobRequest) (*ListPeopleJobResponse, error) {
@@ -81,7 +81,7 @@ func RegisterFPTPeopleJobServer(s grpc.ServiceRegistrar, srv FPTPeopleJobServer)
 }
 
 func _FPTPeopleJob_AssignPeopleJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PeopleJob)
+	in := new(AssignPeopleJobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func _FPTPeopleJob_AssignPeopleJob_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/training.FPTPeopleJob/AssignPeopleJob",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FPTPeopleJobServer).AssignPeopleJob(ctx, req.(*PeopleJob))
+		return srv.(FPTPeopleJobServer).AssignPeopleJob(ctx, req.(*AssignPeopleJobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

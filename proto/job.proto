@@ -4,6 +4,7 @@ option go_package = "./;pb";
 
 service FPTJob {
     rpc CreateJob (Job) returns (Job);
+    rpc FindJob (FindJobRequest) returns (Job);
     rpc ListJob (ListJobRequest) returns (ListJobResponse);
 }
 
@@ -12,6 +13,10 @@ message Job {
     string name = 2;
     string description = 3;
     int64 level = 4;
+}
+
+message FindJobRequest {
+    string id = 1;
 }
 
 message ListJobRequest {

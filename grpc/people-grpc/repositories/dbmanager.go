@@ -2,11 +2,11 @@ package repositories
 
 import (
 	"context"
+	"gin-training/database"
 	"gin-training/grpc/people-grpc/models"
 	"gin-training/grpc/people-grpc/requests"
 
 	"github.com/google/uuid"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +26,7 @@ type dbmanager struct {
 }
 
 func NewDBManager() (PeopleRepository, error) {
-	db, err := gorm.Open(postgres.Open("host=localhost user=admin password=admin dbname=people port=5432 sslmode=disable TimeZone=Asia/Ho_Chi_Minh"))
+	db, err := database.NewGormDB()
 	if err != nil {
 		return nil, err
 	}

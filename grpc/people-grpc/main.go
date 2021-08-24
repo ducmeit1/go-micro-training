@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gin-training/grpc/people-grpc/handlers"
 	"gin-training/grpc/people-grpc/repositories"
+	"gin-training/helper"
 	"gin-training/pb"
 	"net"
 
@@ -12,6 +13,11 @@ import (
 )
 
 func main() {
+	err := helper.AutoBindConfig("config.yml")
+	if err != nil {
+		panic(err)
+	}
+
 	listen, err := net.Listen("tcp", ":2222")
 	if err != nil {
 		panic(err)

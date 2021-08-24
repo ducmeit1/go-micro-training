@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FPTJobClient interface {
 	CreateJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Job, error)
+	FindJob(ctx context.Context, in *FindJobRequest, opts ...grpc.CallOption) (*Job, error)
 	ListJob(ctx context.Context, in *ListJobRequest, opts ...grpc.CallOption) (*ListJobResponse, error)
 }
 
@@ -39,6 +40,15 @@ func (c *fPTJobClient) CreateJob(ctx context.Context, in *Job, opts ...grpc.Call
 	return out, nil
 }
 
+func (c *fPTJobClient) FindJob(ctx context.Context, in *FindJobRequest, opts ...grpc.CallOption) (*Job, error) {
+	out := new(Job)
+	err := c.cc.Invoke(ctx, "/training.FPTJob/FindJob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fPTJobClient) ListJob(ctx context.Context, in *ListJobRequest, opts ...grpc.CallOption) (*ListJobResponse, error) {
 	out := new(ListJobResponse)
 	err := c.cc.Invoke(ctx, "/training.FPTJob/ListJob", in, out, opts...)
@@ -53,6 +63,7 @@ func (c *fPTJobClient) ListJob(ctx context.Context, in *ListJobRequest, opts ...
 // for forward compatibility
 type FPTJobServer interface {
 	CreateJob(context.Context, *Job) (*Job, error)
+	FindJob(context.Context, *FindJobRequest) (*Job, error)
 	ListJob(context.Context, *ListJobRequest) (*ListJobResponse, error)
 	mustEmbedUnimplementedFPTJobServer()
 }
@@ -63,6 +74,9 @@ type UnimplementedFPTJobServer struct {
 
 func (UnimplementedFPTJobServer) CreateJob(context.Context, *Job) (*Job, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateJob not implemented")
+}
+func (UnimplementedFPTJobServer) FindJob(context.Context, *FindJobRequest) (*Job, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindJob not implemented")
 }
 func (UnimplementedFPTJobServer) ListJob(context.Context, *ListJobRequest) (*ListJobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListJob not implemented")
@@ -98,6 +112,24 @@ func _FPTJob_CreateJob_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FPTJob_FindJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FPTJobServer).FindJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/training.FPTJob/FindJob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FPTJobServer).FindJob(ctx, req.(*FindJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FPTJob_ListJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListJobRequest)
 	if err := dec(in); err != nil {
@@ -126,6 +158,10 @@ var FPTJob_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateJob",
 			Handler:    _FPTJob_CreateJob_Handler,
+		},
+		{
+			MethodName: "FindJob",
+			Handler:    _FPTJob_FindJob_Handler,
 		},
 		{
 			MethodName: "ListJob",
