@@ -1,0 +1,29 @@
+syntax = "proto3";
+package training;
+option go_package = "./;pb";
+
+service FPTPeopleJob {
+    rpc AssignPeopleJob(PeopleJob) returns (PeopleJob);
+    rpc ListPeopleJob(ListPeopleJobRequest) returns (ListPeopleJobResponse); 
+}
+
+message PeopleJob {
+    string Id = 1;
+    string PeopleId = 2;     
+    string PeopleSlut = 3;
+    string PeopleName = 4;
+    string JobId = 5;
+    string JobName = 6;
+    string JobRanking = 7;
+    double Salary = 8;      
+    bool Active  = 9;
+}
+
+message ListPeopleJobRequest {
+    double salary = 1;
+    bool active = 2;
+}
+
+message ListPeopleJobResponse {
+    repeated PeopleJob people_jobs = 1;
+}

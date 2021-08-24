@@ -1,0 +1,23 @@
+syntax = "proto3";
+package training;
+option go_package = "./;pb";
+
+service FPTJob {
+    rpc CreateJob (Job) returns (Job);
+    rpc ListJob (ListJobRequest) returns (ListJobResponse);
+}
+
+message Job {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    int64 level = 4;
+}
+
+message ListJobRequest {
+    int64 level = 1;
+}
+
+message ListJobResponse {
+    repeated Job jobs = 1;
+}
