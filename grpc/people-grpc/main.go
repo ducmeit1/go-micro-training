@@ -5,9 +5,12 @@ import (
 	"gin-training/grpc/people-grpc/handlers"
 	"gin-training/grpc/people-grpc/repositories"
 	"gin-training/helper"
+	"gin-training/intercepter"
 	"gin-training/pb"
 	"net"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -23,7 +26,14 @@ func main() {
 		panic(err)
 	}
 
-	s := grpc.NewServer()
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			intercepter.UnaryServerLoggingIntercepter(logger),
+		)),
+	)
 
 	peopleRepository, err := repositories.NewDBManager()
 	if err != nil {
