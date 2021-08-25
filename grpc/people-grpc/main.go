@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"gin-training/grpc/people-grpc/handlers"
 	"gin-training/grpc/people-grpc/repositories"
@@ -15,13 +16,22 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+var (
+	configFile = flag.String("config-file", "config.yml", "Location of config file")
+	port       = flag.Int("port", 2222, "Port of grpc")
+)
+
+func init() {
+	flag.Parse()
+}
+
 func main() {
-	err := helper.AutoBindConfig("config.yml")
+	err := helper.AutoBindConfig(*configFile)
 	if err != nil {
 		panic(err)
 	}
 
-	listen, err := net.Listen("tcp", ":2222")
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%v", *port))
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +58,7 @@ func main() {
 	reflection.Register(s)
 	pb.RegisterFPTPeopleServer(s, h)
 
-	fmt.Println("Listen at port: 2222")
+	fmt.Printf("Listen at port: %v\n", *port)
 
 	s.Serve(listen)
 }
