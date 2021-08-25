@@ -4,10 +4,13 @@ import (
 	"gin-training/api/people-api/handlers"
 	"gin-training/middleware"
 	"gin-training/pb"
+	custom_validator "gin-training/validator"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -30,6 +33,10 @@ func main() {
 	os.Setenv("GIN_MODE", "debug")
 	g := gin.Default()
 	g.Use(middleware.LoggingMiddleware(logger))
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("minage", custom_validator.ValidAgeValidator(int64(18)))
+	}
 
 	//Create routes
 	gr := g.Group("/v1/api")
