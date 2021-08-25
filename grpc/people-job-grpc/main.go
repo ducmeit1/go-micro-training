@@ -8,17 +8,44 @@ import (
 	"gin-training/pb"
 	"net"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 )
 
 func main() {
-	peopleConn, err := grpc.Dial(":2222", grpc.WithInsecure())
+	peopleConn, err := grpc.Dial(":2222",
+		grpc.WithInsecure(),
+		grpc.WithChainUnaryInterceptor(grpc_middleware.ChainUnaryClient(
+			grpc_retry.UnaryClientInterceptor(
+				grpc_retry.WithCodes(codes.DeadlineExceeded, codes.Internal),
+				grpc_retry.WithMax(2)),
+		)),
+		grpc.WithChainStreamInterceptor(grpc_middleware.ChainStreamClient(
+			grpc_retry.StreamClientInterceptor(
+				grpc_retry.WithCodes(codes.DeadlineExceeded, codes.Internal),
+				grpc_retry.WithMax(2)),
+		)),
+	)
+
 	if err != nil {
 		panic(err)
 	}
 
-	jobConn, err := grpc.Dial(":2223", grpc.WithInsecure())
+	jobConn, err := grpc.Dial(":2223",
+		grpc.WithInsecure(),
+		grpc.WithChainUnaryInterceptor(grpc_middleware.ChainUnaryClient(
+			grpc_retry.UnaryClientInterceptor(
+				grpc_retry.WithCodes(codes.DeadlineExceeded, codes.Internal),
+				grpc_retry.WithMax(2)),
+		)),
+		grpc.WithChainStreamInterceptor(grpc_middleware.ChainStreamClient(
+			grpc_retry.StreamClientInterceptor(
+				grpc_retry.WithCodes(codes.DeadlineExceeded, codes.Internal),
+				grpc_retry.WithMax(2)),
+		)))
 	if err != nil {
 		panic(err)
 	}

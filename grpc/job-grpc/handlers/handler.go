@@ -27,7 +27,6 @@ func NewJobHandler(jobRepository repositories.JobRepositories) (*JobHandler, err
 
 func (h *JobHandler) CreateJob(ctx context.Context, req *pb.Job) (*pb.Job, error) {
 	job := &models.Job{}
-
 	err := copier.Copy(&job, &req)
 	if err != nil {
 		return nil, err
