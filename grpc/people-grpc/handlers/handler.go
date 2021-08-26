@@ -3,15 +3,19 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"gin-training/grpc/people-grpc/models"
 	"gin-training/grpc/people-grpc/repositories"
 	"gin-training/grpc/people-grpc/requests"
 	"gin-training/pb"
+	"io"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func findContactIDIndex(contactID uuid.UUID, in []*models.Contact) int {
@@ -26,11 +30,13 @@ func findContactIDIndex(contactID uuid.UUID, in []*models.Contact) int {
 type PeopleHandler struct {
 	pb.UnimplementedFPTPeopleServer
 	peopleRepository repositories.PeopleRepository
+	mu               *sync.Mutex
 }
 
 func NewPeopleHandler(peopleRepository repositories.PeopleRepository) (*PeopleHandler, error) {
 	return &PeopleHandler{
 		peopleRepository: peopleRepository,
+		mu:               &sync.Mutex{},
 	}, nil
 }
 
@@ -245,4 +251,57 @@ func (h *PeopleHandler) DeletePeople(ctx context.Context, in *pb.DeletePeopleReq
 	}
 
 	return &pb.Empty{}, nil
+}
+
+func (h *PeopleHandler) DepositAccountBalance(stream pb.FPTPeople_DepositAccountBalanceServer) error {
+	var balance float64 = 0
+	var peopleID string = ""
+	for {
+		req, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				return stream.SendAndClose(&pb.ChangeAccountBalanceResponse{
+					PeopleId:      peopleID,
+					BlanaceRemain: balance,
+					UpdatedAt:     timestamppb.Now(),
+				})
+			}
+			return err
+		}
+
+		peopleID = req.PeopleId
+
+		fmt.Printf("Receive People ID: %v, Balance: %v\n", req.PeopleId, req.BalanceChange)
+		h.mu.Lock()
+		balance += req.BalanceChange
+		h.mu.Unlock()
+	}
+}
+
+func (h *PeopleHandler) ChangeAccountBalance(stream pb.FPTPeople_ChangeAccountBalanceServer) error {
+	var balance float64 = 0
+	for {
+		req, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+
+		fmt.Printf("Receive People ID: %v, Balance: %v\n", req.PeopleId, req.BalanceChange)
+		h.mu.Lock()
+		balance += req.BalanceChange
+		h.mu.Unlock()
+
+		err = stream.Send(&pb.ChangeAccountBalanceResponse{
+			PeopleId:      req.PeopleId,
+			BalanceChange: req.BalanceChange,
+			BlanaceRemain: balance,
+			UpdatedAt:     timestamppb.Now(),
+		})
+		if err != nil {
+			return err
+		}
+	}
 }

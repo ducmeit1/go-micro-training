@@ -31,6 +31,8 @@ func NewDBManager() (PeopleRepository, error) {
 		return nil, err
 	}
 
+	db = db.Debug()
+
 	err = db.AutoMigrate(
 		&models.People{},
 		&models.Contact{},
@@ -40,7 +42,7 @@ func NewDBManager() (PeopleRepository, error) {
 		return nil, err
 	}
 
-	return &dbmanager{db.Debug()}, nil
+	return &dbmanager{db}, nil
 }
 
 func (m *dbmanager) GetPeopleByID(ctx context.Context, id uuid.UUID) (*models.People, error) {

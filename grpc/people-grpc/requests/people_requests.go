@@ -1,6 +1,6 @@
 package requests
 
-import "github.com/gofrs/uuid"
+import "github.com/google/uuid"
 
 type UpdatePeopleRequest struct {
 	Id      uuid.UUID
@@ -12,4 +12,9 @@ type UpdatePeopleRequest struct {
 
 type ListPeopleRequest struct {
 	Age int64
+}
+
+type UpdateAccountBalanceRequest struct {
+	PeopleId       uuid.UUID
+	AccountBalance float64
 }

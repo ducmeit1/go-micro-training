@@ -23,6 +23,8 @@ type FPTPeopleClient interface {
 	FindPeople(ctx context.Context, in *FindPeopleRequest, opts ...grpc.CallOption) (*People, error)
 	ListPeoples(ctx context.Context, in *ListPeopleRequest, opts ...grpc.CallOption) (*ListPeopleResponse, error)
 	DeletePeople(ctx context.Context, in *DeletePeopleRequest, opts ...grpc.CallOption) (*Empty, error)
+	DepositAccountBalance(ctx context.Context, opts ...grpc.CallOption) (FPTPeople_DepositAccountBalanceClient, error)
+	ChangeAccountBalance(ctx context.Context, opts ...grpc.CallOption) (FPTPeople_ChangeAccountBalanceClient, error)
 }
 
 type fPTPeopleClient struct {
@@ -78,6 +80,71 @@ func (c *fPTPeopleClient) DeletePeople(ctx context.Context, in *DeletePeopleRequ
 	return out, nil
 }
 
+func (c *fPTPeopleClient) DepositAccountBalance(ctx context.Context, opts ...grpc.CallOption) (FPTPeople_DepositAccountBalanceClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FPTPeople_ServiceDesc.Streams[0], "/training.FPTPeople/DepositAccountBalance", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fPTPeopleDepositAccountBalanceClient{stream}
+	return x, nil
+}
+
+type FPTPeople_DepositAccountBalanceClient interface {
+	Send(*ChangeAccountBalanceRequest) error
+	CloseAndRecv() (*ChangeAccountBalanceResponse, error)
+	grpc.ClientStream
+}
+
+type fPTPeopleDepositAccountBalanceClient struct {
+	grpc.ClientStream
+}
+
+func (x *fPTPeopleDepositAccountBalanceClient) Send(m *ChangeAccountBalanceRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *fPTPeopleDepositAccountBalanceClient) CloseAndRecv() (*ChangeAccountBalanceResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(ChangeAccountBalanceResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *fPTPeopleClient) ChangeAccountBalance(ctx context.Context, opts ...grpc.CallOption) (FPTPeople_ChangeAccountBalanceClient, error) {
+	stream, err := c.cc.NewStream(ctx, &FPTPeople_ServiceDesc.Streams[1], "/training.FPTPeople/ChangeAccountBalance", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fPTPeopleChangeAccountBalanceClient{stream}
+	return x, nil
+}
+
+type FPTPeople_ChangeAccountBalanceClient interface {
+	Send(*ChangeAccountBalanceRequest) error
+	Recv() (*ChangeAccountBalanceResponse, error)
+	grpc.ClientStream
+}
+
+type fPTPeopleChangeAccountBalanceClient struct {
+	grpc.ClientStream
+}
+
+func (x *fPTPeopleChangeAccountBalanceClient) Send(m *ChangeAccountBalanceRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *fPTPeopleChangeAccountBalanceClient) Recv() (*ChangeAccountBalanceResponse, error) {
+	m := new(ChangeAccountBalanceResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // FPTPeopleServer is the server API for FPTPeople service.
 // All implementations must embed UnimplementedFPTPeopleServer
 // for forward compatibility
@@ -87,6 +154,8 @@ type FPTPeopleServer interface {
 	FindPeople(context.Context, *FindPeopleRequest) (*People, error)
 	ListPeoples(context.Context, *ListPeopleRequest) (*ListPeopleResponse, error)
 	DeletePeople(context.Context, *DeletePeopleRequest) (*Empty, error)
+	DepositAccountBalance(FPTPeople_DepositAccountBalanceServer) error
+	ChangeAccountBalance(FPTPeople_ChangeAccountBalanceServer) error
 	mustEmbedUnimplementedFPTPeopleServer()
 }
 
@@ -108,6 +177,12 @@ func (UnimplementedFPTPeopleServer) ListPeoples(context.Context, *ListPeopleRequ
 }
 func (UnimplementedFPTPeopleServer) DeletePeople(context.Context, *DeletePeopleRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePeople not implemented")
+}
+func (UnimplementedFPTPeopleServer) DepositAccountBalance(FPTPeople_DepositAccountBalanceServer) error {
+	return status.Errorf(codes.Unimplemented, "method DepositAccountBalance not implemented")
+}
+func (UnimplementedFPTPeopleServer) ChangeAccountBalance(FPTPeople_ChangeAccountBalanceServer) error {
+	return status.Errorf(codes.Unimplemented, "method ChangeAccountBalance not implemented")
 }
 func (UnimplementedFPTPeopleServer) mustEmbedUnimplementedFPTPeopleServer() {}
 
@@ -212,6 +287,58 @@ func _FPTPeople_DeletePeople_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FPTPeople_DepositAccountBalance_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FPTPeopleServer).DepositAccountBalance(&fPTPeopleDepositAccountBalanceServer{stream})
+}
+
+type FPTPeople_DepositAccountBalanceServer interface {
+	SendAndClose(*ChangeAccountBalanceResponse) error
+	Recv() (*ChangeAccountBalanceRequest, error)
+	grpc.ServerStream
+}
+
+type fPTPeopleDepositAccountBalanceServer struct {
+	grpc.ServerStream
+}
+
+func (x *fPTPeopleDepositAccountBalanceServer) SendAndClose(m *ChangeAccountBalanceResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *fPTPeopleDepositAccountBalanceServer) Recv() (*ChangeAccountBalanceRequest, error) {
+	m := new(ChangeAccountBalanceRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _FPTPeople_ChangeAccountBalance_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FPTPeopleServer).ChangeAccountBalance(&fPTPeopleChangeAccountBalanceServer{stream})
+}
+
+type FPTPeople_ChangeAccountBalanceServer interface {
+	Send(*ChangeAccountBalanceResponse) error
+	Recv() (*ChangeAccountBalanceRequest, error)
+	grpc.ServerStream
+}
+
+type fPTPeopleChangeAccountBalanceServer struct {
+	grpc.ServerStream
+}
+
+func (x *fPTPeopleChangeAccountBalanceServer) Send(m *ChangeAccountBalanceResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *fPTPeopleChangeAccountBalanceServer) Recv() (*ChangeAccountBalanceRequest, error) {
+	m := new(ChangeAccountBalanceRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // FPTPeople_ServiceDesc is the grpc.ServiceDesc for FPTPeople service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -240,6 +367,18 @@ var FPTPeople_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _FPTPeople_DeletePeople_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "DepositAccountBalance",
+			Handler:       _FPTPeople_DepositAccountBalance_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "ChangeAccountBalance",
+			Handler:       _FPTPeople_ChangeAccountBalance_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "people.proto",
 }
